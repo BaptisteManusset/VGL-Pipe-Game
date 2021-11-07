@@ -14,7 +14,7 @@ public class Pipe : MonoBehaviour {
 
 
     private void OnMouseDown() {
-        transform.Rotate(new Vector3(0, 0, 90));
+        RotateClock();
     }
 
 
@@ -67,7 +67,10 @@ public class Pipe : MonoBehaviour {
         _links.up = data.directionLinks.left;
 
         data.directionLinks = _links;
+
+        grid.ResetAll();
         visual.UpdateVisual(data);
+
     }
 
     [Button()]
@@ -124,4 +127,10 @@ public class Pipe : MonoBehaviour {
         visual.UpdateVisual(data);
     }
 #endif
+
+
+    private void Reset() {
+        if (visual == null) visual = GetComponentInChildren<PipeVisual>();
+        visual.UpdateVisual(data);
+    }
 }

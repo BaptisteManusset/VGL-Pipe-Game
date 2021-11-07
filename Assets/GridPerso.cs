@@ -12,8 +12,8 @@ public class GridPerso : MonoBehaviour {
     private PipeData[,] pipeArray;
 
 
-    public PipeData input;
-    public PipeData output;
+    public Pipe input;
+    public Pipe output;
 
     public PipeData[,] GetArray() {
         return pipeArray ??= new PipeData[dimension.x, dimension.y];
@@ -21,15 +21,18 @@ public class GridPerso : MonoBehaviour {
 
 
     private void Awake() {
-        foreach (PipeData _pipeData in pipeArray) {
-            if (_pipeData.isInput) input = _pipeData;
-            if (_pipeData.isOutput) output = _pipeData;
-        }
+        // if (pipeArray != null && pipeArray.Length > 0) {
+        //     foreach (PipeData _pipeData in pipeArray) {
+        //         Debug.Log($"{_pipeData} {_pipeData.isInput} {input}");
+        //         if (_pipeData.isInput == true) input = _pipeData;
+        //         if (_pipeData.isOutput == true) output = _pipeData;
+        //     }
+        // }
     }
 
 
     private void Start() {
-        SearchAdjacents(input);
+        ResetAll();
     }
 
     private void SearchAdjacents(PipeData _input) {
@@ -111,5 +114,17 @@ public class GridPerso : MonoBehaviour {
 
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireCube(new Vector3(cursor.x, cursor.y), Vector3.one * .9f);
+    }
+
+    public void ResetAll() {
+        for (int y = 0; y < pipeArray.GetLength(0); y++) {
+            for (int j = 0; j < pipeArray.GetLength(1); j++) {
+                if (pipeArray[y, j] != null) {
+                    pipeArray[y, j].isFilled = pipeArray[y, j].isInput;
+                }
+            }
+        }
+
+        SearchAdjacents(input.data);
     }
 }

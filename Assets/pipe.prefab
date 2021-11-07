@@ -28,6 +28,7 @@ GameObject:
   - component: {fileID: 80892642520947163}
   - component: {fileID: 3391287766991934312}
   - component: {fileID: 2305368573682315012}
+  - component: {fileID: 3914816245218246640}
   m_Layer: 0
   m_Name: pipe
   m_TagString: Untagged
@@ -116,13 +117,26 @@ MonoBehaviour:
     pipe: {fileID: 0}
     position: {x: 0, y: 0}
     isOutput: 0
-    isInput: 1
+    isInput: 0
     isFilled: 0
     directionLinks:
       up: 1
       down: 1
       right: 1
       left: 1
+--- !u!65 &3914816245218246640
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5358307032029318467}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &1758925429702986684
 PrefabInstance:
   m_ObjectHideFlags: 0
