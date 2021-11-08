@@ -147,6 +147,8 @@ namespace CMF {
         ///This function must be called every fixed update, in order for the controller to work correctly;
         /// </summary>
         void ControllerUpdate() {
+            if (GameManager.instance.gMode == GameManager.GMode.Puzzle) return;
+
             //Check if mover is grounded;
             Mover.CheckForGround();
 
