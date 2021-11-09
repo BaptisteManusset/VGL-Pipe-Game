@@ -5,11 +5,12 @@ TagManager:
   serializedVersion: 2
   tags:
   - object
+  - Item
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Environnement
   - Water
   - UI
   - 

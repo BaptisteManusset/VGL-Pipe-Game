@@ -36,4 +36,5 @@ public class PipeData {
 
 
     public DirectionLinks directionLinks;
+    public bool isEmpty = false;
 }

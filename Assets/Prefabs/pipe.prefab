@@ -16,6 +16,7 @@ MonoBehaviour:
   down: {fileID: 4970953738044866460}
   right: {fileID: 1854386014576832209}
   left: {fileID: 1639071970958807280}
+  body: {fileID: 5464828997874526603}
   fill: {fileID: 7307212449447652566}
 --- !u!1 &3001560242028940016
 GameObject:
@@ -208,6 +209,7 @@ MonoBehaviour:
       down: 1
       right: 1
       left: 1
+    isEmpty: 0
   visual: {fileID: 3622501031245729155}
 --- !u!65 &3914816245218246640
 BoxCollider:
@@ -367,6 +369,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -3739803804689893452, guid: afbf2845951ff044f8ba0b8374991d5e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -1875312870212281287, guid: afbf2845951ff044f8ba0b8374991d5e, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -1875312870212281287, guid: afbf2845951ff044f8ba0b8374991d5e, type: 3}
       propertyPath: m_Materials.Array.data[1]
       value: 
@@ -389,6 +399,11 @@ GameObject:
 --- !u!4 &2297482488444120151 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: afbf2845951ff044f8ba0b8374991d5e, type: 3}
+  m_PrefabInstance: {fileID: 1758925429702986684}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5464828997874526603 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6034274152469865015, guid: afbf2845951ff044f8ba0b8374991d5e, type: 3}
   m_PrefabInstance: {fileID: 1758925429702986684}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &2512210972770300778 stripped

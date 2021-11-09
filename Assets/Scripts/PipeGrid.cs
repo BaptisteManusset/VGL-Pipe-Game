@@ -3,7 +3,7 @@ using System.Collections;
 using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
+using Random = System.Random;
 
 public class PipeGrid : MonoBehaviour {
     public Vector2Int dimension = new Vector2Int(6, 3);
@@ -12,17 +12,19 @@ public class PipeGrid : MonoBehaviour {
     public Pipe input;
     public Pipe output;
 
+    public Renderer background;
 
     public Transform cursorObject;
 
     public bool isSelected = false;
+    public bool inRange = false;
 
 
     public Transform cameraPoint;
 
     private CursorVisual cursorVisual;
 
-    private float maxDistance = 8;
+    private float maxDistance = 5;
 
 
     public UnityEvent onSuccess = new UnityEvent();
@@ -31,8 +33,11 @@ public class PipeGrid : MonoBehaviour {
     public PipeData currentPipe;
 
     public bool isWorking = false;
-
+    public GameObject lamp;
     public Vector3 Center => transform.position + new Vector3(dimension.x, dimension.y, 0) / 2;
+
+    [SerializeField] private GameObject spline;
+
 
     private void Awake() {
         cursorVisual = GetComponentInChildren<CursorVisual>();
@@ -48,15 +53,30 @@ public class PipeGrid : MonoBehaviour {
         isWorking = _b;
     }
 
+    private void OnTriggerEnter(Collider other) {
+        _distance = true;
+    }
+
+    private void OnTriggerExit(Collider other) {
+        _distance = false;
+    }
+
+    private bool _distance = false;
+
     private void Update() {
         if (isSelected == false) {
             if (GameManager.IsExplorationMode()) {
-                float _distance = Vector3.Distance(GameManager.instance.player.transform.position, Center);
-                if (_distance <= maxDistance && isWorking) {
+                // float _distance = Vector3.Distance(GameManager.instance.player.transform.position, Center);
+                if (_distance && isWorking) {
+                    inRange = true;
+
                     if (Input.GetKeyDown(KeyCode.Return)) {
                         GameManager.SetToPuzzleMode(this);
                         isSelected = true;
                     }
+                }
+                else {
+                    inRange = false;
                 }
 
                 return;
@@ -94,12 +114,34 @@ public class PipeGrid : MonoBehaviour {
 
 
         if (Input.GetKeyDown(KeyCode.Space)) RotatePipe();
+        if (Input.GetKeyDown(KeyCode.P)) PlacePipe();
 
         #endregion
     }
 
+    private void PlacePipe() {
+        var d = pipeArray[cursor.x, cursor.y];
+        if (d.isEmpty) {
+            if (Inventory.instance.inventory == null) return;
+            pipeArray[cursor.x, cursor.y].directionLinks = Inventory.instance.inventory.data.directionLinks;
+            pipeArray[cursor.x, cursor.y].pipe.visual.UpdateVisual(Inventory.instance.inventory.data);
+            Inventory.instance.RemoveItem();
+            d.isEmpty = false;
+
+            ResetAll();
+        }
+    }
+
+
 #if UNITY_EDITOR
-    private void OnDrawGizmos() {
+    [Button]
+    private void RandomPosition() {
+        foreach (Pipe pipe in GetComponentsInChildren<Pipe>()) {
+            pipe.RandomPipe();
+        }
+    }
+
+    private void OnDrawGizmosSelected() {
         Gizmos.matrix = transform.localToWorldMatrix;
         for (int i = 0; i < dimension.x; i++) {
             for (int j = 0; j < dimension.y; j++) {
@@ -163,6 +205,24 @@ public class PipeGrid : MonoBehaviour {
     private void OnSuccess() {
         Debug.Log("Sucess");
         onSuccess.Invoke();
+        GameManager.SetToExplorationMode();
+        UpdateWire();
+    }
+
+
+    [SerializeField] private Material sucessMaterial;
+
+    private void UpdateWire() {
+        Transform _child = spline.transform.GetChild(0);
+        for (int i = 0; i < _child.childCount; i++) {
+            MeshRenderer _renderer = _child.GetChild(i).GetComponent<MeshRenderer>();
+            _renderer.material = sucessMaterial;
+        }
+    }
+
+
+    public PipeData GetCaseAtCusor() {
+        return pipeArray[cursor.x, cursor.y];
     }
 
     private void SearchAdjacent(PipeData _current, Vector2Int _pos) {
@@ -245,5 +305,34 @@ public class PipeGrid : MonoBehaviour {
     [Button]
     private void SetCameraPoint() {
         Vector3 position = transform.position + new Vector3(dimension.x, dimension.y, 0) / 2;
+    }
+
+    private void OnBecameVisible() {
+        Debug.Log("visible");
+    }
+
+
+    private void FixedUpdate() {
+        Color _color = Color.black;
+
+
+        if (isWorking) {
+            if (isSelected) {
+                _color = Color.white;
+            }
+            else {
+                _color = Color.gray;
+            }
+
+            if (inRange) _color = new Color(0.96f, 0.98f, 0.79f);
+
+            if (output.data.isFilled) {
+                _color = new Color(0.18f, 0.66f, 0.07f);
+            }
+        }
+
+        lamp.SetActive(isWorking);
+
+        background.material.SetColor("_Color", _color);
     }
 }

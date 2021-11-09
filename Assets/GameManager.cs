@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class GameManager : MonoBehaviour {
     public enum GMode {
@@ -44,10 +43,6 @@ public class GameManager : MonoBehaviour {
         instance.OnPuzzleMode?.Invoke();
 
         instance.pipeGrid = _pipeGrid;
-        //
-        //
-        // instance.player.transform.position = _pipeGrid.cameraPoint.position;
-        // instance.player.transform.rotation = _pipeGrid.cameraPoint.rotation;
     }
 
     public static void SetToExplorationMode() {
@@ -56,4 +51,6 @@ public class GameManager : MonoBehaviour {
 
         instance.OnExplorationMode?.Invoke();
     }
+    
+    
 }

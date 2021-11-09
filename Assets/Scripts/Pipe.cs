@@ -12,16 +12,17 @@ public class Pipe : MonoBehaviour {
 
     private PipeGrid pipeGrid;
 
-    //
-    // private void OnMouseDown() {
-    //     Rotate();
-    // }
-
+    private bool isFloating = false;
 
     private void Awake() {
         pipeGrid = GetComponentInParent<PipeGrid>();
+
         visual = GetComponentInChildren<PipeVisual>();
 
+        if (pipeGrid == null) {
+            isFloating = true;
+            return;
+        }
 
         data.isFilled = data.isInput;
 
@@ -54,15 +55,38 @@ public class Pipe : MonoBehaviour {
         visual.UpdateVisual(data);
     }
 
-    private void SetPipe(string name, PipeData.DirectionLinks _directionLinks) {
+    private void SetPipe(string _name, PipeData.DirectionLinks _directionLinks) {
+        data.isEmpty = false;
         data.directionLinks = _directionLinks;
         visual.UpdateVisual(data);
-
-        gameObject.name = "Pipe " + name;
+        SetName();
     }
 
+    private void SetPipe(string _name) {
+        data.isEmpty = true;
+        data.directionLinks = new PipeData.DirectionLinks() {
+            up = false,
+            right = false,
+            down = false,
+            left = false
+        };
+        visual.UpdateVisual(data);
+        SetName();
+    }
 
+    [ContextMenu(nameof(SetName))]
+    public void SetName() {
+        gameObject.name = $"[{transform.localPosition.y}:{transform.localPosition.x}] Pipe";
+        if (isFloating) {
+            gameObject.name += " Floating";
+            return;
+        }
 
+        if (data.isOutput) gameObject.name += " Ouput";
+        if (data.isInput) gameObject.name += " Input";
+        if (data.isEmpty) gameObject.name += " Empty";
+        if (data.isFilled) gameObject.name += " Filled";
+    }
 
     private void Reset() {
         if (visual == null) visual = GetComponentInChildren<PipeVisual>();
@@ -73,7 +97,8 @@ public class Pipe : MonoBehaviour {
     #region editor buttons
 
     [Button()]
-    private void PipeCross() {
+    [ContextMenu("Pipe Cross")]
+    public void PipeCross() {
         SetPipe("Cross", new PipeData.DirectionLinks() {
             up = true,
             right = true,
@@ -83,7 +108,8 @@ public class Pipe : MonoBehaviour {
     }
 
     [Button()]
-    private void PipeT() {
+    [ContextMenu("PipeT")]
+    public void PipeT() {
         SetPipe("T", new PipeData.DirectionLinks() {
             up = false,
             right = true,
@@ -93,7 +119,8 @@ public class Pipe : MonoBehaviour {
     }
 
     [Button()]
-    private void PipeI() {
+    [ContextMenu("PipeI")]
+    public void PipeI() {
         SetPipe("I", new PipeData.DirectionLinks() {
             up = true,
             right = false,
@@ -103,7 +130,8 @@ public class Pipe : MonoBehaviour {
     }
 
     [Button()]
-    private void PipeAngle() {
+    [ContextMenu("PipeAngle")]
+    public void PipeAngle() {
         SetPipe("Angle", new PipeData.DirectionLinks() {
             up = true,
             right = true,
@@ -112,13 +140,20 @@ public class Pipe : MonoBehaviour {
         });
     }
 
+    [Button()]
+    [ContextMenu("Pipe Empty")]
+    public void PipeEmpty() {
+        SetPipe("Empty");
+    }
+
     #endregion
-    
-    
+
+
 #if UNITY_EDITOR
     private void OnValidate() {
         if (visual == null) visual = GetComponentInChildren<PipeVisual>();
         visual.UpdateVisual(data);
+        SetName();
     }
 
     private void OnDrawGizmos() {
@@ -145,4 +180,28 @@ public class Pipe : MonoBehaviour {
             Gizmos.DrawWireCube(Vector3.zero, new Vector3(.7f, .7f, .7f));
     }
 #endif
+    [Button()]
+    [ContextMenu("Random Pipe")]
+    public void RandomPipe() {
+        if (data.isInput || data.isOutput || data.isLocked) return;
+
+        int i = UnityEngine.Random.Range(0, 4);
+        switch (i) {
+            case 1:
+                PipeAngle();
+                break;
+            case 2:
+                PipeCross();
+                break;
+            case 3:
+                PipeI();
+                break;
+            case 4:
+                PipeT();
+                break;
+            default:
+                PipeEmpty();
+                break;
+        }
+    }
 }
