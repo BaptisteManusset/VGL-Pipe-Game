@@ -203,7 +203,7 @@ public class PipeGrid : MonoBehaviour {
     }
 
     private void OnSuccess() {
-        Debug.Log("Sucess");
+        completed = true;
         onSuccess.Invoke();
         GameManager.SetToExplorationMode();
         UpdateWire();
@@ -211,6 +211,7 @@ public class PipeGrid : MonoBehaviour {
 
 
     [SerializeField] private Material sucessMaterial;
+    public bool completed = false;
 
     private void UpdateWire() {
         Transform _child = spline.transform.GetChild(0);

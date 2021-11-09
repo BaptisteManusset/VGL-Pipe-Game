@@ -1,0 +1,19 @@
+{
+    "name": "Unity.Recorder.Editor",
+    "rootNamespace": "",
+    "references": [
+        "Unity.Recorder",
+        "Unity.Timeline.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
