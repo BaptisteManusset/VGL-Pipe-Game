@@ -27,6 +27,9 @@ public class PipeData {
         public bool down = false;
         public bool right = false;
         public bool left = false;
+
+        public static DirectionLinks Empty => new DirectionLinks() { up = false, down = false, right = false, left = false };
+        public static DirectionLinks Full => new DirectionLinks() { up = true, down = true, right = true, left = true };
     }
 
     public bool isOutput = false;

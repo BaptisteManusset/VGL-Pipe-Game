@@ -56,26 +56,26 @@ public class PipeGrid : MonoBehaviour {
     private bool distance = false;
 
     private void Update() {
-        if (isSelected == false) {
-            if (GameManager.IsExplorationMode()) {
-                if (Input.GetKeyDown(KeyCode.Return)) {
-                    float distance = Vector3.Distance(GameManager.instance.player.transform.position, Center);
-                    if (distance <= maxDistance && isWorking) {
-                        inRange = true;
+        // if (isSelected == false) {
+        if (GameManager.IsExplorationMode()) {
+            if (Input.GetKeyDown(KeyCode.Return)) {
+                float distance = Vector3.Distance(GameManager.instance.player.transform.position, Center);
+                if (distance <= maxDistance && isWorking) {
+                    inRange = true;
 
-                        GameManager.SetToPuzzleMode(this);
-                        isSelected = true;
-                    }
+                    GameManager.SetToPuzzleMode(this);
+                    isSelected = true;
                 }
-                else {
-                    inRange = false;
-                }
-
-                return;
+            }
+            else {
+                inRange = false;
             }
 
             return;
         }
+
+        //     return;
+        // }
 
         #region input
 
@@ -106,28 +106,31 @@ public class PipeGrid : MonoBehaviour {
             }
 
 
-            if (Input.GetKeyDown(KeyCode.Space)) RotatePipe();
-            if (Input.GetKeyDown(KeyCode.P)) PlacePipe();
-            if (Input.GetKeyDown(KeyCode.P)) GetPipe();
+            if (Input.GetKeyDown(Keys.Interaction)) RotatePipe();
+            if (Input.GetKeyDown(Keys.Interaction)) PlacePipe();
+            if (Input.GetKeyDown(Keys.InteractionSecondary)) GetPipe();
         }
 
         #endregion
     }
 
     private void GetPipe() {
+        Debug.Log("GetPipe");
         var _d = pipeArray[cursor.x, cursor.y];
         if (_d.isEmpty) return;
-        if (Inventory.instance.inventory != null) return;
-        //////////////////////////////////////////////////////////////////////////////////////////
+        if (_d.isLocked || _d.isOutput || _d.isInput) return;
+        if (Inventory.instance.isEmpty == false) return;
+
+        Inventory.instance.Slot = _d;
         ResetAll();
     }
 
     private void PlacePipe() {
         var _d = pipeArray[cursor.x, cursor.y];
         if (_d.isEmpty) {
-            if (Inventory.instance.inventory == null) return;
-            pipeArray[cursor.x, cursor.y].directionLinks = Inventory.instance.inventory.data.directionLinks;
-            pipeArray[cursor.x, cursor.y].pipe.visual.UpdateVisual(Inventory.instance.inventory.data);
+            if (Inventory.instance.isEmpty) return;
+            pipeArray[cursor.x, cursor.y].directionLinks = Inventory.instance.Slot.directionLinks;
+            pipeArray[cursor.x, cursor.y].pipe.visual.UpdateVisual(Inventory.instance.Slot);
             Inventory.instance.RemoveItem();
             _d.isEmpty = false;
 
@@ -204,7 +207,7 @@ public class PipeGrid : MonoBehaviour {
     private void OnSuccess() {
         completed = true;
         onSuccess.Invoke();
-        GameManager.SetToExplorationMode();
+        // GameManager.SetToExplorationMode();
         UpdateWire();
     }
 

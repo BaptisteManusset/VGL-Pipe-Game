@@ -13,7 +13,8 @@ public class ControlesUi : MonoBehaviour {
         if (GameManager.IsPuzzleMode()) {
             text.text += Place("Echap", "Exit Puzzle mode");
             text.text += Place("Space", "Rotate Pipe");
-            if (Inventory.instance.inventory != null) text.text += Place("P", "Place Pipe");
+            if (Inventory.instance.isEmpty) return;
+            text.text += Place("P", "Place Pipe");
         }
         else {
             text.text += Place("Enter", "Enter Puzzle mode");
