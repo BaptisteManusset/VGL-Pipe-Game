@@ -1,4 +1,5 @@
 using System;
+using NaughtyAttributes;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour {
@@ -15,7 +16,7 @@ public class GameManager : MonoBehaviour {
     public static GameManager instance;
 
     public GameObject player;
-    public Camera playerCamera;
+    [ReadOnly] public Camera playerCamera;
     public PipeGrid pipeGrid;
 
     private void Awake() {
@@ -37,11 +38,9 @@ public class GameManager : MonoBehaviour {
         if (_pipeGrid == null) {
             throw new Exception("Missing pipe grid");
         }
-
+      
         instance.gMode = GMode.Puzzle;
-
         instance.OnPuzzleMode?.Invoke();
-
         instance.pipeGrid = _pipeGrid;
     }
 
@@ -51,6 +50,4 @@ public class GameManager : MonoBehaviour {
 
         instance.OnExplorationMode?.Invoke();
     }
-    
-    
 }

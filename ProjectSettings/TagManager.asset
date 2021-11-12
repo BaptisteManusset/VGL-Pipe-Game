@@ -6,6 +6,7 @@ TagManager:
   tags:
   - object
   - Item
+  - Grid
   layers:
   - Default
   - TransparentFX

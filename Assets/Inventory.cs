@@ -33,8 +33,6 @@ public class Inventory : MonoBehaviour {
     private void GrabObject(Collider _hit) {
         inventory = _hit.GetComponent<Item>().GetItem();
         ui.SetActive(true);
-
-        // Instantiate(ui, uiParent.transform.position, quaternion.identity, uiParent.transform);
     }
 
     public void RemoveItem() {

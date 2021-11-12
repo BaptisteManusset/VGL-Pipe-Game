@@ -1,8 +1,12 @@
 using UnityEngine;
 
 public class FreeCam : MonoBehaviour {
-    const int MOUSE_LEFT_BUTTON = 0;
-    const int MOUSE_RIGHT_BUTTON = 1;
+    /*
+        const int MOUSE_LEFT_BUTTON = 0;
+    */
+    /*
+        const int MOUSE_RIGHT_BUTTON = 1;
+    */
 
     /// <summary>
     /// Mouse sensitivity.
@@ -25,38 +29,48 @@ public class FreeCam : MonoBehaviour {
         _lastMousePosition = new Vector3(0, 0, 0);
     }
 
+    public float mouseSensitivity = 100.0f;
+    public float clampAngle = 80.0f;
 
-    private void Update() {
+    private float rotY = 0.0f; // rotation around the up/y axis
+    private float rotX = 0.0f; // rotation around the right/x axis
+
+    void Start() {
+        Vector3 _rot = transform.localRotation.eulerAngles;
+        rotY = _rot.y;
+        rotX = _rot.x;
+    }
+
+    void Update() {
+        Cursor.lockState = CursorLockMode.Locked;
+        // Cursor.visible = true;
         if (GameManager.IsPuzzleMode()) return;
+        float _mouseX = Input.GetAxis("Mouse X");
+        float _mouseY = -Input.GetAxis("Mouse Y");
 
-        HandleMouse();
+        rotY += _mouseX * mouseSensitivity * Time.deltaTime;
+        rotX += _mouseY * mouseSensitivity * Time.deltaTime;
+
+        rotX = Mathf.Clamp(rotX, -clampAngle, clampAngle);
+
+        Quaternion _localRotation = Quaternion.Euler(rotX, rotY, 0.0f);
+        transform.rotation = _localRotation;
+
         HandleKeyboard();
     }
 
-    private void HandleMouse() {
-        Vector3 cursorDelta = Input.mousePosition - _lastMousePosition;
-        cursorDelta = new Vector3(-cursorDelta.y * MouseSensitivity, cursorDelta.x * MouseSensitivity, 0);
-        cursorDelta = new Vector3(transform.eulerAngles.x + cursorDelta.x, transform.eulerAngles.y + cursorDelta.y, 0);
-
-        // if (Input.GetMouseButton(MOUSE_RIGHT_BUTTON)) {
-        transform.eulerAngles = cursorDelta;
-        // }
-
-        _lastMousePosition = Input.mousePosition;
-    }
-
     private void HandleKeyboard() {
-        Vector3 position = new Vector3();
+        Vector3 _position = new Vector3();
 
-        if (Input.GetKey(KeyCode.A)) position += Vector3.down;
-        if (Input.GetKey(KeyCode.E)) position += Vector3.up;
-        if (Input.GetKey(KeyCode.Z)) position += Vector3.forward;
-        if (Input.GetKey(KeyCode.Q)) position += Vector3.left;
-        if (Input.GetKey(KeyCode.S)) position += Vector3.back;
-        if (Input.GetKey(KeyCode.D)) position += Vector3.right;
+        // if (Input.GetKey(KeyCode.A)) _position += Vector3.down;
+        // if (Input.GetKey(KeyCode.E)) _position += Vector3.up;
+        if (Input.GetKey(KeyCode.Z)) _position += Vector3.forward;
+        if (Input.GetKey(KeyCode.Q)) _position += Vector3.left;
+        if (Input.GetKey(KeyCode.S)) _position += Vector3.back;
+        if (Input.GetKey(KeyCode.D)) _position += Vector3.right;
 
-        position = position * Time.deltaTime * KeyboardSensitivity;
+        _position = _position * Time.deltaTime * KeyboardSensitivity;
 
-        transform.Translate(position);
+        transform.Translate(_position);
     }
 }

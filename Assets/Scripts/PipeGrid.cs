@@ -1,9 +1,7 @@
-using System;
 using System.Collections;
 using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.Events;
-using Random = System.Random;
 
 public class PipeGrid : MonoBehaviour {
     public Vector2Int dimension = new Vector2Int(6, 3);
@@ -18,9 +16,6 @@ public class PipeGrid : MonoBehaviour {
 
     public bool isSelected = false;
     public bool inRange = false;
-
-
-    public Transform cameraPoint;
 
     private CursorVisual cursorVisual;
 
@@ -38,39 +33,36 @@ public class PipeGrid : MonoBehaviour {
 
     [SerializeField] private GameObject spline;
 
-
     private void Awake() {
         cursorVisual = GetComponentInChildren<CursorVisual>();
     }
-
 
     private void Start() {
         ResetAll();
     }
 
-
     public void ToggleIsWorking(bool _b) {
         isWorking = _b;
     }
 
-    private void OnTriggerEnter(Collider other) {
-        _distance = true;
-    }
+    // private void OnTriggerEnter(Collider _other) {
+    //     distance = true;
+    // }
+    //
+    // private void OnTriggerExit(Collider _other) {
+    //     distance = false;
+    // }
 
-    private void OnTriggerExit(Collider other) {
-        _distance = false;
-    }
-
-    private bool _distance = false;
+    private bool distance = false;
 
     private void Update() {
         if (isSelected == false) {
             if (GameManager.IsExplorationMode()) {
-                // float _distance = Vector3.Distance(GameManager.instance.player.transform.position, Center);
-                if (_distance && isWorking) {
-                    inRange = true;
+                if (Input.GetKeyDown(KeyCode.Return)) {
+                    float distance = Vector3.Distance(GameManager.instance.player.transform.position, Center);
+                    if (distance <= maxDistance && isWorking) {
+                        inRange = true;
 
-                    if (Input.GetKeyDown(KeyCode.Return)) {
                         GameManager.SetToPuzzleMode(this);
                         isSelected = true;
                     }
@@ -87,46 +79,57 @@ public class PipeGrid : MonoBehaviour {
 
         #region input
 
-        if (Input.GetKeyDown(KeyCode.LeftArrow)) {
-            cursor.x++;
-            UpdateCusorPosition();
+        if (GameManager.IsPuzzleMode() && isSelected) {
+            if (Input.GetKeyDown(KeyCode.LeftArrow)) {
+                cursor.x++;
+                UpdateCusorPosition();
+            }
+
+            if (Input.GetKeyDown(KeyCode.RightArrow)) {
+                cursor.x--;
+                UpdateCusorPosition();
+            }
+
+            if (Input.GetKeyDown(KeyCode.UpArrow)) {
+                cursor.y++;
+                UpdateCusorPosition();
+            }
+
+            if (Input.GetKeyDown(KeyCode.DownArrow)) {
+                cursor.y--;
+                UpdateCusorPosition();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Escape)) {
+                GameManager.SetToExplorationMode();
+                isSelected = false;
+            }
+
+
+            if (Input.GetKeyDown(KeyCode.Space)) RotatePipe();
+            if (Input.GetKeyDown(KeyCode.P)) PlacePipe();
+            if (Input.GetKeyDown(KeyCode.P)) GetPipe();
         }
-
-        if (Input.GetKeyDown(KeyCode.RightArrow)) {
-            cursor.x--;
-            UpdateCusorPosition();
-        }
-
-        if (Input.GetKeyDown(KeyCode.UpArrow)) {
-            cursor.y++;
-            UpdateCusorPosition();
-        }
-
-        if (Input.GetKeyDown(KeyCode.DownArrow)) {
-            cursor.y--;
-            UpdateCusorPosition();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Escape)) {
-            GameManager.SetToExplorationMode();
-            isSelected = false;
-        }
-
-
-        if (Input.GetKeyDown(KeyCode.Space)) RotatePipe();
-        if (Input.GetKeyDown(KeyCode.P)) PlacePipe();
 
         #endregion
     }
 
+    private void GetPipe() {
+        var _d = pipeArray[cursor.x, cursor.y];
+        if (_d.isEmpty) return;
+        if (Inventory.instance.inventory != null) return;
+        //////////////////////////////////////////////////////////////////////////////////////////
+        ResetAll();
+    }
+
     private void PlacePipe() {
-        var d = pipeArray[cursor.x, cursor.y];
-        if (d.isEmpty) {
+        var _d = pipeArray[cursor.x, cursor.y];
+        if (_d.isEmpty) {
             if (Inventory.instance.inventory == null) return;
             pipeArray[cursor.x, cursor.y].directionLinks = Inventory.instance.inventory.data.directionLinks;
             pipeArray[cursor.x, cursor.y].pipe.visual.UpdateVisual(Inventory.instance.inventory.data);
             Inventory.instance.RemoveItem();
-            d.isEmpty = false;
+            _d.isEmpty = false;
 
             ResetAll();
         }
@@ -136,16 +139,16 @@ public class PipeGrid : MonoBehaviour {
 #if UNITY_EDITOR
     [Button]
     private void RandomPosition() {
-        foreach (Pipe pipe in GetComponentsInChildren<Pipe>()) {
-            pipe.RandomPipe();
+        foreach (Pipe _pipe in GetComponentsInChildren<Pipe>()) {
+            _pipe.RandomPipe();
         }
     }
 
     private void OnDrawGizmosSelected() {
         Gizmos.matrix = transform.localToWorldMatrix;
-        for (int i = 0; i < dimension.x; i++) {
-            for (int j = 0; j < dimension.y; j++) {
-                Gizmos.DrawWireCube(new Vector3(i, j), Vector3.one * .8f);
+        for (int _i = 0; _i < dimension.x; _i++) {
+            for (int _j = 0; _j < dimension.y; _j++) {
+                Gizmos.DrawWireCube(new Vector3(_i, _j), Vector3.one * .8f);
             }
         }
 
@@ -155,10 +158,6 @@ public class PipeGrid : MonoBehaviour {
         Gizmos.DrawWireCube(new Vector3(cursor.x, cursor.y), Vector3.one * .9f);
 
         Gizmos.DrawWireSphere(new Vector3(dimension.x, dimension.y, 0) / 2, maxDistance);
-
-        Gizmos.DrawSphere(cameraPoint.localPosition, .5f);
-
-        // if (Application.isPlaying) Gizmos.DrawFrustum(cursorObject.localPosition, GameManager.instance.playerCamera.fieldOfView, 10, 0, GameManager.instance.playerCamera.aspect);
     }
 #endif
 
@@ -175,12 +174,12 @@ public class PipeGrid : MonoBehaviour {
     }
 
     public void ResetAll() {
-        for (int y = 0; y < pipeArray.GetLength(0); y++) {
-            for (int j = 0; j < pipeArray.GetLength(1); j++) {
-                if (pipeArray[y, j] != null) {
-                    pipeArray[y, j].isFilled = pipeArray[y, j].isInput;
+        for (int _y = 0; _y < pipeArray.GetLength(0); _y++) {
+            for (int _j = 0; _j < pipeArray.GetLength(1); _j++) {
+                if (pipeArray[_y, _j] != null) {
+                    pipeArray[_y, _j].isFilled = pipeArray[_y, _j].isInput;
 
-                    pipeArray[y, j].pipe.visual.UpdateVisual(pipeArray[y, j]);
+                    pipeArray[_y, _j].pipe.visual.UpdateVisual(pipeArray[_y, _j]);
                 }
             }
         }
@@ -215,8 +214,8 @@ public class PipeGrid : MonoBehaviour {
 
     private void UpdateWire() {
         Transform _child = spline.transform.GetChild(0);
-        for (int i = 0; i < _child.childCount; i++) {
-            MeshRenderer _renderer = _child.GetChild(i).GetComponent<MeshRenderer>();
+        for (int _i = 0; _i < _child.childCount; _i++) {
+            MeshRenderer _renderer = _child.GetChild(_i).GetComponent<MeshRenderer>();
             _renderer.material = sucessMaterial;
         }
     }
@@ -305,7 +304,7 @@ public class PipeGrid : MonoBehaviour {
 
     [Button]
     private void SetCameraPoint() {
-        Vector3 position = transform.position + new Vector3(dimension.x, dimension.y, 0) / 2;
+        Vector3 _position = transform.position + new Vector3(dimension.x, dimension.y, 0) / 2;
     }
 
     private void OnBecameVisible() {
